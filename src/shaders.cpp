@@ -37,3 +37,9 @@ unsigned int LoadShader(const int type, const char* name)
 
     return shader;
 }
+
+void LinkValidateProgram(unsigned int program)
+{
+    glLinkProgram(program);
+    glValidateProgram(program);
+}

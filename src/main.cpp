@@ -65,6 +65,8 @@ int main(int argc, char** argv)
         return -2;
     }
 
+    glGetError();
+
     InitScene();
 
     glutDisplayFunc(Display);
@@ -79,11 +81,12 @@ int main(int argc, char** argv)
 
 void InitScene()
 {
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+
     program = glCreateProgram();
     glAttachShader(program, LoadShader(GL_VERTEX_SHADER, "data/shaders/basic_vs.glsl"));
     glAttachShader(program, LoadShader(GL_FRAGMENT_SHADER, "data/shaders/basic_fs.glsl"));
-    glLinkProgram(program);
-    glValidateProgram(program);
+    LinkValidateProgram(program);
 
     glGenVertexArrays(1, &vertexArray);
     glBindVertexArray(vertexArray);
@@ -121,7 +124,7 @@ void DisplayScene()
     glm::mat4x4 projViModMat = projMat * viMat * modMat;
     glUniformMatrix4fv(glGetUniformLocation(program, "projViModMat"), 1, GL_FALSE, glm::value_ptr(projViModMat));
 
-    glDrawElements(GL_TRIANGLES, 4 * 2, GL_UNSIGNED_INT, NULL);
+    glDrawElements(GL_TRIANGLES, 4 * 3, GL_UNSIGNED_INT, NULL);
 
     glBindVertexArray(0);
     glUseProgram(0);
@@ -147,9 +150,6 @@ void Display()
     case GL_INVALID_FRAMEBUFFER_OPERATION:
         std::cout << "frOp\n";
         exit(2);
-    /*case GL_INVALID_OPERATION:
-        std::cout << "Op\n";
-        exit(2);*/
     case GL_STACK_OVERFLOW:
         std::cout << "over\n";
         exit(2);
