@@ -10,7 +10,7 @@
 #include "shaders.h"
 
 float left = -2.0f, right = 2.0f, top = 2.0f, bottom = -2.0f;
-float zNear = 0.0001f, zFar = 10.0f;
+float zNear = -2.0f, zFar = 2.0f;
 float scale = 1.0f;
 float transX = 0.0f, transY = 0.0f;
 
@@ -46,7 +46,6 @@ int main(int argc, char** argv)
     glutInitContextProfile(GLUT_CORE_PROFILE);
 
     glutInitWindowSize(800, 600);
-
     glutCreateWindow("2D Game");
 
     glewExperimental = GL_TRUE;
@@ -92,6 +91,8 @@ void InitScene()
     glBindVertexArray(vertexArray);
 
     glGenBuffers(1, &vertexBuffer);
+
+    glGenBuffers(1, &vertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(basicPosition), basicPosition, GL_STATIC_DRAW);
 
@@ -111,7 +112,7 @@ void DisplayScene()
 {
     glm::mat4x4 viMat = glm::mat4x4(1.0);
 
-    viMat = glm::lookAt(glm::vec3(0.0f, 0.0f, (zFar + zNear) / 2.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    //viMat = glm::lookAt(glm::vec3(0.0f, 0.0f, (zFar + zNear) / 2.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 
     glm::mat4x4 modMat = glm::mat4x4(1.0);
 
@@ -124,7 +125,7 @@ void DisplayScene()
     glm::mat4x4 projViModMat = projMat * viMat * modMat;
     glUniformMatrix4fv(glGetUniformLocation(program, "projViModMat"), 1, GL_FALSE, glm::value_ptr(projViModMat));
 
-    glDrawElements(GL_TRIANGLES, 4 * 3, GL_UNSIGNED_INT, NULL);
+    glDrawElements(GL_LINES, 4 * 3, GL_UNSIGNED_INT, NULL);
 
     glBindVertexArray(0);
     glUseProgram(0);
@@ -150,6 +151,9 @@ void Display()
     case GL_INVALID_FRAMEBUFFER_OPERATION:
         std::cout << "frOp\n";
         exit(2);
+    case GL_INVALID_OPERATION:
+        std::cout << "Op\n";
+        exit(2);
     case GL_STACK_OVERFLOW:
         std::cout << "over\n";
         exit(2);
@@ -172,6 +176,16 @@ void Display()
 void Reshape(int w, int h)
 {
     glViewport(0, 0, w, h);
+
+    if( w < h && w > 0 )
+         projMat = glm::ortho( left, right, bottom*h/w, top*h/w, zNear, zFar );
+    else
+    {
+        if (w >= h && h > 0)
+            projMat = glm::ortho( left*w/h, right*w/h, bottom, top, zNear, zFar );
+        else
+            projMat = glm::ortho( left, right, bottom, top, zNear, zFar );
+    }
 }
 
 void DeleteScene()
