@@ -7,7 +7,7 @@ unsigned int LoadShader(const int type, const char* name)
 {
     std::ifstream fin;
 
-    fin.open(0, std::ios::binary);
+    fin.open(name, std::ios::binary);
 
     if(fin.bad())
     {
